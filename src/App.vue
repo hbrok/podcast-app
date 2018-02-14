@@ -1,28 +1,357 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="site__header">
+    <div class="site__header-wrapper">
+      <form action="">
+        <label for="podcast-search">Search for a podcast</label>
+        <div class="results-wrapper">
+          <input type="search" name="podcast-search" ref="searchBar" v-on:input="search" v-on:blur="resetSearch">
+          
+          <ul v-if="searchResults">
+            <li v-for="(result, index) in searchResults" v-on:click="loadPodcast(result.feedUrl)">
+              {{ result.trackName }}
+            </li>
+          </ul>
+        </div>
+        <button type="submit">
+          <span class="screen-reader-text">Search</span>
+          <svg class="icon icon-search">
+              <use xlink:href="#search"></use>
+            </svg> 
+        </button>
+      </form>
+    </div>
   </div>
+
+  <div class="podcast__header">
+    <div class="podcast__header-inner">
+      <h1 class="podcast__title">{{ title }}</h1>
+      <img class="podcast__cover-image" :src="coverImage" alt="">
+
+      <div>
+        <p>{{ summary }}</p>
+        <ul class="podcast__meta">
+          <li>
+            <svg class="icon icon-clock">
+              <use xlink:href="#clock"></use>
+            </svg> Last updated {{ lastUpdated }}
+          </li>
+          <li><svg class="icon icon-link">
+              <use xlink:href="#link"></use>
+            </svg> <a :href="link">{{ link }}</a>
+            </li>
+          <li>
+            <svg class="icon icon-headphones">
+              <use xlink:href="#headphones"></use>
+            </svg> {{ episodes.length }} episodes
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <svg class="svg" viewBox="0 0 1439 80" xmlns="http://www.w3.org/2000/svg">
+      <g fill="currentColor">
+          <path d="M-1,80 L1439,80 L1439,75.0577158 C1379.79277,41.1506119 1270.6261,17.4276478 1111.5,3.88882329 C874.5,-16.2756963 723.714904,48.2131338 344,54.8931963 C226.309936,56.9636364 111.309936,46.4859939 -1,23.4602687 L-1,80 Z" id="Path"></path>
+      </g>
+    </svg>
+  </div>
+
+  <section class="podcast__episodes">
+    <PodcastEpisode
+      v-for="(episode, index) in episodes"
+      :episode="episode"
+      :coverImage="coverImage"
+      :key="index"
+    ></PodcastEpisode>
+  </section>
+
+  <Player :coverImage="coverImage"></Player>
+
+  <SVGSprites></SVGSprites>
+</div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Player from "./components/Player.vue";
+import PodcastEpisode from "./components/PodcastEpisode.vue";
+import SVGSprites from "./components/SVGSprites.vue";
+import { getJSON } from "./utils";
+
+const getElement = (parent, tagName) =>
+  parent.getElementsByTagName(tagName)[0].textContent;
+
+const getElements = (parent, tagName) => parent.getElementsByTagName(tagName);
 
 export default {
-  name: 'app',
+  name: "app",
   components: {
-    HelloWorld
+    Player,
+    PodcastEpisode,
+    SVGSprites
+  },
+  data: function() {
+    return {
+      title: "",
+      lastUpdated: "",
+      link: "",
+      summary: "",
+      coverImage: "",
+      episodes: []
+    };
+  },
+  methods: {
+    loadPodcast: function(feedUrl) {
+      this.resetSearch();
+
+      fetch(new Request(`https://cors-anywhere.herokuapp.com/${feedUrl}`)).then(
+        results => {
+          // results returns XML. lets cast this to a string, then create
+          // a new DOM object out of it!
+          results.text().then(str => {
+            let responseDoc = new DOMParser().parseFromString(
+              str,
+              "application/xml"
+            );
+
+            this.title = getElement(responseDoc, "title");
+            this.lastUpdated = getElement(responseDoc, "pubDate");
+            this.link = getElement(responseDoc, "link");
+            this.summary = getElement(responseDoc, "itunes:summary");
+            this.coverImage = responseDoc
+              .getElementsByTagName("itunes:image")[0]
+              .getAttribute("href");
+            this.episodes = [];
+            Array.from(getElements(responseDoc, "item")).forEach(item => {
+              this.episodes.push({
+                title: getElement(item, "title"),
+                pubDate: getElement(item, "pubDate"),
+                description: getElement(item, "description"),
+                duration: getElement(item, "itunes:duration"),
+                audio: item
+                  .getElementsByTagName("enclosure")[0]
+                  .getAttribute("url")
+              });
+            });
+
+            const lastUpdated = Date.parse(this.lastUpdated);
+            this.lastUpdated = `${lastUpdated}`;
+
+            console.log(this.episodes);
+          });
+        }
+      );
+    },
+    resetSearch: function(e) {
+      // e.currentTarget.value = '';
+      // this.searchResults = [];
+    },
+    search: function(e) {
+      const _that = this;
+      const chars = e.currentTarget.value.length;
+      console.log(chars);
+      this.searchResults = [];
+
+      // Search if we have more than 3 chars.
+      if (chars < 3) {
+        return;
+      }
+
+      if (this.currentSearch) {
+        this.currentSearch.abort();
+      }
+
+      this.currentSearch = getJSON(
+        `https://itunes.apple.com/search?media=podcast&attribute=titleTerm&limit=15&term=${
+          e.currentTarget.value
+        }`,
+        function(response) {
+          for (var i = 0; i < response.results.length; i++) {
+            _that.searchResults.push({
+              trackName: response.results[i].trackName,
+              feedUrl: response.results[i].feedUrl
+            });
+          }
+
+          _that.currentSearch = false;
+        }
+      );
+    }
+  },
+  created: function() {
+    this.loadPodcast(`https://mbmbam.libsyn.com/rss`);
   }
-}
+};
 </script>
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+<style lang="scss">
+@import "variables.scss";
+
+body {
+  margin: 0;
+  background-color: $white;
+  font-family: Montserrat, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+    Open Sans, Ubuntu, Fira Sans, Helvetica Neue, sans-serif;
+  color: $black;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+}
+
+p {
+  margin-top: 0;
+}
+
+button {
+  font-family: inherit;
+}
+
+.screen-reader-text {
+  border: 0;
+  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute !important;
+  width: 1px;
+  word-wrap: normal !important;
+}
+
+.site__header {
+  background-color: $black;
+  padding: 1rem;
+  color: $white;
+  box-shadow: 0 -5px 10px 0 rgba(42, 45, 66, 0.5);
+
+  form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  input[type="search"] {
+    position: relative;
+    z-index: 1;
+    border-radius: 5px 0 0 5px;
+    border: 2px solid $light-grey;
+    padding: 0.45rem 0.5rem;
+    color: $dark-grey;
+  }
+
+  label {
+    width: auto;
+    margin-right: 1rem;
+  }
+
+  button {
+    padding: 0.45rem 0.75rem;
+    border-color: #e8e8e8;
+    border-radius: 0 5px 5px 0;
+    background-color: $light-grey;
+  }
+}
+
+.results-wrapper ul {
+  position: absolute;
+  width: 315px;
+  max-width: 100%;
+  margin: 0;
+  margin-top: 0.3rem;
+  padding: 0;
+  border-radius: 5px;
+  box-shadow: 1px 1px 10px 0px rgba($black, 0.5);
+  background-color: $white;
+  font-size: 0.9rem;
+  color: $black;
+  list-style: none;
+  overflow: hidden;
+
+  li {
+    padding: 0.5rem 0.5rem;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid $light-grey;
+    }
+
+    &:hover {
+      background-color: $light-grey;
+    }
+  }
+}
+
+.site__header-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.page--wrap {
+  width: 100%;
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.podcast__header {
+  margin-bottom: 1rem;
+  background-image: linear-gradient(-147deg, #de8d94 0%, #808fae 100%);
+
+  .icon {
+    font-size: 0.8rem;
+    margin-right: 0.25rem;
+  }
+}
+
+.podcast__header-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 300px) auto;
+  grid-column-gap: 20px;
+  grid-template-areas:
+    "podcast-image podcast-title"
+    "podcast-image podcast-meta";
+  width: 100%;
+  max-width: 895px;
+  padding: 2rem;
+  margin: 0 auto;
+  color: $white;
+}
+
+.svg {
+  display: block;
+  color: $white;
+}
+
+.podcast__title {
+  grid-area: podcast-title;
+  margin: 0;
+  margin-bottom: 1rem;
+  font-size: 2rem;
+}
+
+.podcast__cover-image {
+  grid-area: podcast-image;
+  max-width: 100%;
+  border-radius: 5px;
+  box-shadow: 0 5px 20px 0px rgba(50, 70, 107, 0.5);
+}
+
+.podcast__meta {
+  grid-area: podcast-meta;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+
+  li {
+    margin-bottom: 0.5rem;
+  }
+}
+
+.podcast__episodes {
+  list-style-type: none;
+  max-width: 770px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 </style>
