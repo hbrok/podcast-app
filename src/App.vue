@@ -2,24 +2,7 @@
   <div id="app">
   <div class="site__header">
     <div class="site__header-wrapper">
-      <form action="">
-        <label for="podcast-search">Search for a podcast</label>
-        <div class="results-wrapper">
-          <input type="search" name="podcast-search" ref="searchBar" v-on:input="search" v-on:blur="resetSearch">
-          
-          <ul v-if="searchResults">
-            <li v-for="(result, index) in searchResults" v-on:click="loadPodcast(result.feedUrl)">
-              {{ result.trackName }}
-            </li>
-          </ul>
-        </div>
-        <button type="submit">
-          <span class="screen-reader-text">Search</span>
-          <svg class="icon icon-search">
-              <use xlink:href="#search"></use>
-            </svg> 
-        </button>
-      </form>
+      <SearchBar></SearchBar>
     </div>
   </div>
 
@@ -74,8 +57,10 @@
 <script>
 import Player from "./components/Player.vue";
 import PodcastEpisode from "./components/PodcastEpisode.vue";
+import SearchBar from "./components/SearchBar.vue";
 import SVGSprites from "./components/SVGSprites.vue";
-import { getJSON } from "./utils";
+
+import eventHub from "./event-hub";
 
 const getElement = (parent, tagName) =>
   parent.getElementsByTagName(tagName)[0].textContent;
@@ -87,7 +72,8 @@ export default {
   components: {
     Player,
     PodcastEpisode,
-    SVGSprites
+    SVGSprites,
+    SearchBar
   },
   data: function() {
     return {
@@ -99,9 +85,15 @@ export default {
       episodes: []
     };
   },
+  created: function() {
+    this.loadPodcast(`https://mbmbam.libsyn.com/rss`);
+    eventHub.$on("load-podcast", this.loadPodcast);
+  },
   methods: {
     loadPodcast: function(feedUrl) {
-      this.resetSearch();
+      // this.resetSearch();
+      eventHub.$emit("reset-search");
+      console.log(feedUrl);
 
       fetch(new Request(`https://cors-anywhere.herokuapp.com/${feedUrl}`)).then(
         results => {
@@ -140,45 +132,7 @@ export default {
           });
         }
       );
-    },
-    resetSearch: function(e) {
-      // e.currentTarget.value = '';
-      // this.searchResults = [];
-    },
-    search: function(e) {
-      const _that = this;
-      const chars = e.currentTarget.value.length;
-      console.log(chars);
-      this.searchResults = [];
-
-      // Search if we have more than 3 chars.
-      if (chars < 3) {
-        return;
-      }
-
-      if (this.currentSearch) {
-        this.currentSearch.abort();
-      }
-
-      this.currentSearch = getJSON(
-        `https://itunes.apple.com/search?media=podcast&attribute=titleTerm&limit=15&term=${
-          e.currentTarget.value
-        }`,
-        function(response) {
-          for (var i = 0; i < response.results.length; i++) {
-            _that.searchResults.push({
-              trackName: response.results[i].trackName,
-              feedUrl: response.results[i].feedUrl
-            });
-          }
-
-          _that.currentSearch = false;
-        }
-      );
     }
-  },
-  created: function() {
-    this.loadPodcast(`https://mbmbam.libsyn.com/rss`);
   }
 };
 </script>
@@ -221,64 +175,6 @@ button {
   padding: 1rem;
   color: $white;
   box-shadow: 0 -5px 10px 0 rgba(42, 45, 66, 0.5);
-
-  form {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  input[type="search"] {
-    position: relative;
-    z-index: 1;
-    border-radius: 5px 0 0 5px;
-    border: 2px solid $light-grey;
-    padding: 0.45rem 0.5rem;
-    color: $dark-grey;
-  }
-
-  label {
-    width: auto;
-    margin-right: 1rem;
-  }
-
-  button {
-    padding: 0.45rem 0.75rem;
-    border-color: #e8e8e8;
-    border-radius: 0 5px 5px 0;
-    background-color: $light-grey;
-  }
-}
-
-.results-wrapper ul {
-  position: absolute;
-  width: 315px;
-  max-width: 100%;
-  margin: 0;
-  margin-top: 0.3rem;
-  padding: 0;
-  border-radius: 5px;
-  box-shadow: 1px 1px 10px 0px rgba($black, 0.5);
-  background-color: $white;
-  font-size: 0.9rem;
-  color: $black;
-  list-style: none;
-  overflow: hidden;
-
-  li {
-    padding: 0.5rem 0.5rem;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-
-    &:not(:last-child) {
-      border-bottom: 1px solid $light-grey;
-    }
-
-    &:hover {
-      background-color: $light-grey;
-    }
-  }
 }
 
 .site__header-wrapper {
