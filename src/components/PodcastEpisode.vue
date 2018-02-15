@@ -34,11 +34,18 @@ export default {
     },
     coverImage: {
       type: String
+    },
+    podcastTitle: {
+      type: String
     }
   },
   methods: {
     loadEpisode: function() {
-      eventHub.$emit("play-episode", this.episode);
+      eventHub.$emit("play-episode", {
+        episode: this.episode,
+        coverImage: this.coverImage,
+        podcastTitle: this.podcastTitle
+      });
     }
   }
 };

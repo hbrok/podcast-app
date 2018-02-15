@@ -38,6 +38,7 @@
       v-for="(episode, index) in episodes"
       :episode="episode"
       :coverImage="coverImage"
+      :podcastTitle="title"
       :key="index"
     ></PodcastEpisode>
   </section>

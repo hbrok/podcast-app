@@ -14,7 +14,7 @@
         <img class="player__image" :src="coverImage" alt="">
 
         <div class="player__title">
-          <b>{{ title }}</b><br> {{ currentlyPlaying.title }}
+          <b>{{ podcastTitle }}</b><br> {{ currentlyPlaying.title }}
         </div>
 
         <div class="progress__bar progress__bar--duration">
@@ -83,6 +83,8 @@ export default {
   data: function() {
     return {
       currentlyPlaying: false,
+      coverImage: "",
+      podcastTitle: "",
       currentTime: "0:00:00",
       duration: "0:00:00",
       mousedown: false,
@@ -103,11 +105,13 @@ export default {
     eventHub.$on("play-episode", this.loadEpisode);
   },
   methods: {
-    loadEpisode: function(episode) {
+    loadEpisode: function({ episode, coverImage, podcastTitle }) {
       const player = this.$refs.playerAudio;
       const button = this.$refs.playerButton;
 
       this.currentlyPlaying = episode;
+      this.coverImage = coverImage;
+      this.podcastTitle = podcastTitle;
       player.setAttribute("src", episode.audio);
       this.togglePlay();
       player.play();
