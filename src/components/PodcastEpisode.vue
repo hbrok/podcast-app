@@ -2,7 +2,7 @@
 <article class="podcast-episode">
   <div>
     <img class="podcast-episode__cover-image" :src="coverImage" alt="">
-    <button class="podcast-episode__button" v-on:click="loadEpisode" :data-index="index">
+    <button class="podcast-episode__button" v-on:click="loadEpisode">
       <svg class="icon icon-play">
         <use xlink:href="#play"></use>
       </svg> Play

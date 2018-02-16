@@ -8,7 +8,7 @@
 
   <router-view></router-view>
 
-  <Player :coverImage="coverImage"></Player>
+  <Player></Player>
 
   <SVGSprites></SVGSprites>
 </div>

@@ -96,11 +96,6 @@ export default {
       }
     };
   },
-  props: {
-    coverImage: {
-      type: String
-    }
-  },
   created: function() {
     eventHub.$on("play-episode", this.loadEpisode);
   },
@@ -159,9 +154,6 @@ export default {
       const player = this.$refs.playerAudio;
       const progressBar = this.$refs.progressBar;
       const progress = this.$refs.progress;
-
-      console.log(progress);
-
       const scrubTime = e.offsetX / progress.offsetWidth * player.duration;
 
       player.currentTime = scrubTime;

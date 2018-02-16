@@ -78,7 +78,6 @@ export default {
     loadPodcast: function(feedUrl) {
       // this.resetSearch();
       eventHub.$emit("reset-search");
-      console.log(feedUrl);
 
       fetch(new Request(`https://cors-anywhere.herokuapp.com/${feedUrl}`)).then(
         results => {
@@ -112,8 +111,6 @@ export default {
 
             const lastUpdated = Date.parse(this.lastUpdated);
             this.lastUpdated = `${lastUpdated}`;
-
-            console.log(this.episodes);
           });
         }
       );

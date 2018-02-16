@@ -50,7 +50,6 @@ export default {
   },
   methods: {
     loadPodcast: function(feedUrl) {
-      console.log("loadPodcast");
       eventHub.$emit("load-podcast", feedUrl);
     },
     resetSearch: function(e) {
@@ -60,7 +59,7 @@ export default {
     search: function(e) {
       const _that = this;
       const chars = e.currentTarget.value.length;
-      console.log(chars);
+
       this.searchResults = [];
 
       // Search if we have more than 3 chars.
