@@ -1,6 +1,6 @@
 <template>
-<div v-if="currentlyPlaying" class="player-wrapper">
-    <audio
+<div>
+  <audio
       ref="playerAudio"
       class="player__video viewer"
       v-on:play="updateButton"
@@ -9,6 +9,7 @@
       v-on:durationchange="durationUpdate"
     ></audio>
 
+  <div v-if="currentlyPlaying" class="player-wrapper">
     <div class="player-wrapper__inner">
       <div class="player">
         <img class="player__image" :src="coverImage" alt="">
@@ -32,10 +33,10 @@
           <span class="duration">{{ duration }}</span>
           <div class="player__buttons">
             <button v-on:click="skip" data-skip="-10" class="player__button">
-               <svg class="icon icon-back">
+              <svg class="icon icon-back">
                 <use xlink:href="#back"></use>
               </svg>&nbsp;10s
-             </button>
+            </button>
 
             <button
               class="player__button toggle"
@@ -73,6 +74,7 @@
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <script>
