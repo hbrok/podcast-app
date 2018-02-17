@@ -1,8 +1,8 @@
-export const getJSON = function (url, callback) {
+export const getJSON = function(url, callback) {
   const request = new XMLHttpRequest();
   request.open("GET", url, true);
 
-  request.onload = function () {
+  request.onload = function() {
     if (this.status >= 200 && this.status < 400) {
       callback(JSON.parse(this.response));
     } else {
@@ -11,10 +11,10 @@ export const getJSON = function (url, callback) {
     }
   };
 
-  request.onerror = function () {
+  request.onerror = function() {
     // There was a connection error of some sort
     console.error(this.statusText);
   };
 
   request.send();
-}
+};
