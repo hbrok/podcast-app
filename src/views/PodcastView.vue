@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import PodcastEpisode from "../components/PodcastEpisode.vue";
+import PodcastEpisode from "@/components/PodcastEpisode.vue";
 
 import eventHub from "../event-hub";
 

@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Router from "vue-router";
-import PodcastView from "../views/PodcastView.vue";
+import PodcastView from "@/views/PodcastView.vue";
 
 Vue.use(Router);
 
