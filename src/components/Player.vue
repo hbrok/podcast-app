@@ -1,142 +1,144 @@
 <template>
-<div>
-  <audio
-      ref="playerAudio"
-      class="player__video viewer"
-      v-on:play="updateButton"
-      v-on:pause="updateButton"
-      v-on:timeupdate="handleProgress"
-      v-on:durationchange="durationUpdate"
-    ></audio>
+  <div>
+    <audio
+        ref="playerAudio"
+        class="player__video viewer"
+        :src="episode.audio"
+        @loadeddata="togglePlay"
+        @timeupdate="(currentTime = formatTime($event.target.currentTime)) && handleProgress()"
+        @durationchange="duration = formatTime($event.target.duration)"
+      ></audio>
 
-  <div v-if="currentlyPlaying" class="player-wrapper">
-    <div class="player-wrapper__inner">
-      <div class="player">
-        <img class="player__image" :src="coverImage" alt="">
-
-        <div class="player__title">
-          <b>{{ podcastTitle }}</b><br> {{ currentlyPlaying.title }}
-        </div>
-
-        <div class="progress__bar progress__bar--duration">
-          <div
-            class="progress" 
-            ref="progress"
-            v-on:click="scrubAudio"
-            v-on:mousemove="mousedown && scrubAudio($event)"
-            v-on:mousedown="mousedown = true"
-            v-on:mouseup="mousedown = false"
+    <div
+      v-if="episode"
+      class="player-wrapper"
+    >
+      <div class="player-wrapper__inner">
+        <div class="player">
+          <img
+            class="player__image"
+            :src="coverImage"
+            alt=""
           >
-            <div class="progress__filled" ref="progressBar"></div>
+
+          <div class="player__title">
+            <b>{{ podcastTitle }}</b><br> {{ episode.title }}
           </div>
-          <span class="current-time">{{ currentTime }}</span>
-          <span class="duration">{{ duration }}</span>
-          <div class="player__buttons">
-            <button v-on:click="skip" data-skip="-10" class="player__button">
-              <svg class="icon icon-back">
-                <use xlink:href="#back"></use>
-              </svg>&nbsp;10s
-            </button>
 
-            <button
-              class="player__button toggle"
-              title="Toggle Play"
-              v-on:click="togglePlay"
-              ref="playerButton"
-            ></button>
-
-            <button v-on:click="skip" data-skip="25" class="player__button">
-            25s&nbsp;<svg class="icon icon-forward">
-              <use xlink:href="#forward"></use>
-            </svg>
+          <div class="progress__bar progress__bar--duration">
+            <div
+              class="progress" 
+              ref="progress"
+              @click="scrubAudio"
+              @mousemove="mousedown && scrubAudio($event)"
+              @mousedown="mousedown = true"
+              @mouseup="mousedown = false"
+            >
+              <div
+                class="progress__filled"
+                ref="progressBar"
+                :style="{ flexBasis: progressPercent }"
+              ></div>
+            </div>
+            <span class="current-time">{{ currentTime }}</span>
+            <span class="duration">{{ duration }}</span>
+            <div class="player__buttons">
+              <button
+                @click="skip(-10)"
+                class="player__button"
+              >
+                <svg class="icon icon-back"><use xlink:href="#back"/></svg>&nbsp;10s
               </button>
-          </div>
-        </div>
 
-        <div class="progress__bar progress__bar--volume">
-          <svg class="icon icon-volume-low">
-              <use xlink:href="#volume-low"></use>
-            </svg>
-          <div
-            class="progress"
-            ref="volume"
-            v-on:click="scrubVolume"
-            v-on:mousemove="mousedown && scrubVolume($event)"
-            v-on:mousedown="mousedown = true"
-            v-on:mouseup="mousedown = false"
-          >
-            <div class="progress__filled" ref="volumeBar"></div>
+              <button
+                class="player__button toggle"
+                title="Toggle Play"
+                @click="togglePlay"
+                v-html="buttonIcon"
+              ></button>
+
+              <button
+                @click="skip(25)"
+                class="player__button"
+              >
+                25s&nbsp;<svg class="icon icon-forward"><use xlink:href="#forward"/></svg>
+              </button>
+            </div>
           </div>
-          <svg class="icon icon-volume-high">
-              <use xlink:href="#volume-high"></use>
+
+          <div class="progress__bar progress__bar--volume">
+            <svg class="icon icon-volume-low">
+              <use xlink:href="#volume-low"/>
             </svg>
+
+            <div
+              class="progress"
+              ref="volume"
+              @click="scrubVolume"
+              @mousemove="mousedown && scrubVolume($event)"
+              @mousedown="mousedown = true"
+              @mouseup="mousedown = false"
+            >
+              <div
+                class="progress__filled"
+                ref="volumeBar"></div>
+            </div>
+
+            <svg class="icon icon-volume-high">
+              <use xlink:href="#volume-high"/>
+            </svg>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 </template>
 
 <script>
-import eventHub from "../event-hub";
+import eventHub from "@/event-hub";
 
 export default {
   name: "Player",
   data: function() {
     return {
-      currentlyPlaying: false,
+      playing: false,
+      episode: false,
       coverImage: "",
       podcastTitle: "",
       currentTime: "0:00:00",
       duration: "0:00:00",
       mousedown: false,
-      icons: {
-        play:
-          '<svg class="icon icon-play"><use xlink:href="#play"></use></svg>',
-        pause:
-          '<svg class="icon icon-pause"><use xlink:href="#pause"></use></svg>'
-      }
+      progressPercent: "0%"
     };
   },
-  created: function() {
+  computed: {
+    buttonIcon: function() {
+      return this.playing
+        ? '<svg class="icon icon-play"><use xlink:href="#play"></use></svg>'
+        : '<svg class="icon icon-pause"><use xlink:href="#pause"></use></svg>';
+    }
+  },
+  mounted: function() {
     eventHub.$on("play-episode", this.loadEpisode);
   },
   methods: {
     loadEpisode: function({ episode, coverImage, podcastTitle }) {
-      const player = this.$refs.playerAudio;
-      const button = this.$refs.playerButton;
-
-      this.currentlyPlaying = episode;
+      this.episode = episode;
       this.coverImage = coverImage;
       this.podcastTitle = podcastTitle;
-      player.setAttribute("src", episode.audio);
-      this.togglePlay();
-      player.play();
     },
     togglePlay: function() {
       const player = this.$refs.playerAudio;
       const method = player.paused ? "play" : "pause";
 
+      this.playing = !player.paused;
       player[method]();
-      this.updateButton();
-    },
-    updateButton: function() {
-      const player = this.$refs.playerAudio;
-      const button = this.$refs.playerButton;
-      const icon = player.paused ? this.icons.play : this.icons.pause;
-
-      button.innerHTML = icon;
     },
     handleProgress: function() {
       const player = this.$refs.playerAudio;
-      const progressBar = this.$refs.progressBar;
       const percent = player.currentTime / player.duration * 100;
 
-      this.currentTime = this.formatTime(player.currentTime);
-      progressBar.style.flexBasis = `${percent}%`;
-    },
-    durationUpdate: function(e) {
-      this.duration = this.formatTime(e.currentTarget.duration);
+      this.progressPercent = `${percent}%`;
     },
     formatTime: function(timeInSeconds) {
       const hours = Math.floor((timeInSeconds / 3600) % 60);
@@ -148,13 +150,8 @@ export default {
 
       return `${hours}:${minutes}:${seconds}`;
     },
-    handleVolumeUpdate: function(e) {
-      const player = this.$refs.playerAudio;
-      player.volume = e.currentTarget.value;
-    },
     scrubAudio: function(e) {
       const player = this.$refs.playerAudio;
-      const progressBar = this.$refs.progressBar;
       const progress = this.$refs.progress;
       const scrubTime = e.offsetX / progress.offsetWidth * player.duration;
 
@@ -164,15 +161,14 @@ export default {
       const player = this.$refs.playerAudio;
       const volumeBar = this.$refs.volumeBar;
       const volume = this.$refs.volume;
+      const scrubVolume = e.offsetX / volume.offsetWidth * 10000;
 
-      const scrubTime = e.offsetX / volume.offsetWidth * 10000;
-
-      volumeBar.style.flexBasis = `${scrubTime / 100}%`;
-      player.volume = scrubTime / 10000;
+      volumeBar.style.flexBasis = `${scrubVolume / 100}%`;
+      player.volume = scrubVolume / 10000;
     },
-    skip: function(e) {
+    skip: function(skip) {
       const player = this.$refs.playerAudio;
-      player.currentTime += parseFloat(e.currentTarget.dataset.skip);
+      player.currentTime += parseFloat(skip);
     }
   }
 };
