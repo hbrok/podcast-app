@@ -1,19 +1,24 @@
 <template>
-  <form>
+  <form @submit.prevent>
     <label for="podcast-search">Search for a podcast</label>
     <div class="results-wrapper">
       <input
+        autocomplete="off"
         type="search"
         name="podcast-search"
         ref="searchBar"
         @input="search"
         @blur="resetSearch"
+        @keyup.up="prevSearchResult"
+        @keyup.down.prevent="nextSearchResult"
+        @keyup.enter="loadPodcast(searchResults[selectedSearchResult].feedUrl)"
       >
       
       <ul v-if="searchResults">
         <li
           v-for="(result, index) in searchResults"
           :key="index"
+          :class="index === selectedSearchResult ? 'selected' : ''"
           @click="loadPodcast(result.feedUrl)"
         >
           {{ result.trackName }}
@@ -45,24 +50,42 @@ export default {
     return {
       typeAhead: null,
       searchResults: [],
-      currentSearch: false
+      currentSearch: false,
+      selectedSearchResult: -1
     };
   },
   created: function() {
     eventHub.$on("reset-search", this.resetSearch);
   },
   methods: {
+    nextSearchResult: function() {
+      this.selectedSearchResult === this.searchResults.length - 1
+        ? (this.selectedSearchResult = 0)
+        : this.selectedSearchResult++;
+    },
+    prevSearchResult: function() {
+      this.selectedSearchResult === 0
+        ? (this.selectedSearchResult = this.searchResults.length - 1)
+        : this.selectedSearchResult--;
+    },
     loadPodcast: function(feedUrl) {
       eventHub.$emit("load-podcast", feedUrl);
     },
     resetSearch: function() {
-      // e.currentTarget.value = "";
-      // this.searchResults = [];
+      const _that = this;
+      this.selectedSearchResult = -1;
+
+      // When clicking a search result, the results clear before the click can register,
+      // setting a timeout fixes it for now.
+      setTimeout(function() {
+        _that.searchResults = [];
+      }, 500);
     },
     search: function(e) {
       const _that = this;
       const chars = e.currentTarget.value.length;
 
+      this.selectedSearchResult = -1;
       this.searchResults = [];
 
       // Search if we have more than 3 chars.
@@ -75,7 +98,7 @@ export default {
       }
 
       this.currentSearch = getJSON(
-        `https://itunes.apple.com/search?media=podcast&attribute=titleTerm&limit=15&term=${
+        `https://itunes.apple.com/search?media=podcast&attribute=titleTerm&limit=10&term=${
           e.currentTarget.value
         }`,
         function(response) {
@@ -149,8 +172,10 @@ button {
       border-bottom: 1px solid $light-grey;
     }
 
+    &.selected,
     &:hover {
       background-color: $light-grey;
+      cursor: pointer;
     }
   }
 }

@@ -87,7 +87,6 @@ export default {
   },
   methods: {
     loadPodcast: function(feedUrl) {
-      // this.resetSearch();
       eventHub.$emit("reset-search");
 
       fetch(new Request(`https://cors-anywhere.herokuapp.com/${feedUrl}`)).then(
