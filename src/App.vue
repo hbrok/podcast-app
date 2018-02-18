@@ -1,17 +1,17 @@
 <template>
   <div id="app">
-  <div class="site__header">
-    <div class="site__header-wrapper">
-      <SearchBar/>
+    <div class="site__header">
+      <div class="site__header-wrapper">
+        <SearchBar/>
+      </div>
     </div>
+
+    <router-view/>
+
+    <Player/>
+
+    <SVGSprites/>
   </div>
-
-  <router-view/>
-
-  <Player/>
-  
-  <SVGSprites/>
-</div>
 </template>
 
 <script>

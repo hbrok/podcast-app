@@ -1,56 +1,59 @@
 <template>
-<div>
-  <div class="podcast__header">
-    <div class="podcast__header-inner">
-      <h1 class="podcast__title">{{ title }}</h1>
-      <img
-        class="podcast__cover-image"
-        :src="coverImage"
-        alt=""
-      >
+  <div>
+    <div class="podcast__header">
+      <div class="podcast__header-inner">
+        <h1 class="podcast__title">{{ title }}</h1>
+        <img
+          class="podcast__cover-image"
+          :src="coverImage"
+          alt=""
+        >
 
-      <div>
-        <p>{{ summary }}</p>
-        <ul class="podcast__meta">
-          <li>
-            <svg class="icon icon-clock">
-              <use xlink:href="#clock"/>
-            </svg> Last updated {{ lastUpdated }}
-          </li>
-          <li><svg class="icon icon-link">
-              <use xlink:href="#link"/>
-            </svg> <a :href="link">{{ link }}</a>
+        <div>
+          <p>{{ summary }}</p>
+          <ul class="podcast__meta">
+            <li>
+              <svg class="icon icon-clock">
+                <use xlink:href="#clock"/>
+              </svg> Last updated {{ lastUpdated }}
             </li>
-          <li>
-            <svg class="icon icon-headphones">
-              <use xlink:href="#headphones"/>
-            </svg> {{ episodes.length }} episodes
-          </li>
-        </ul>
+
+            <li>
+              <svg class="icon icon-link">
+                <use xlink:href="#link"/>
+              </svg> <a :href="link">{{ link }}</a>
+            </li>
+
+            <li>
+              <svg class="icon icon-headphones">
+                <use xlink:href="#headphones"/>
+              </svg> {{ episodes.length }} episodes
+            </li>
+          </ul>
+        </div>
       </div>
+
+      <svg
+        class="svg"
+        viewBox="0 0 1439 80"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <g fill="currentColor">
+          <path d="M-1,80 L1439,80 L1439,75.0577158 C1379.79277,41.1506119 1270.6261,17.4276478 1111.5,3.88882329 C874.5,-16.2756963 723.714904,48.2131338 344,54.8931963 C226.309936,56.9636364 111.309936,46.4859939 -1,23.4602687 L-1,80 Z"/>
+        </g>
+      </svg>  
     </div>
 
-    <svg
-      class="svg"
-      viewBox="0 0 1439 80"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <g fill="currentColor">
-          <path d="M-1,80 L1439,80 L1439,75.0577158 C1379.79277,41.1506119 1270.6261,17.4276478 1111.5,3.88882329 C874.5,-16.2756963 723.714904,48.2131338 344,54.8931963 C226.309936,56.9636364 111.309936,46.4859939 -1,23.4602687 L-1,80 Z"/>
-      </g>
-    </svg>
+    <section class="podcast__episodes">
+      <PodcastEpisode
+        v-for="(episode, index) in episodes"
+        :episode="episode"
+        :cover-image="coverImage"
+        :podcast-title="title"
+        :key="index"
+      />
+    </section>
   </div>
-
-  <section class="podcast__episodes">
-    <PodcastEpisode
-      v-for="(episode, index) in episodes"
-      :episode="episode"
-      :cover-image="coverImage"
-      :podcast-title="title"
-      :key="index"
-    />
-  </section>
-</div>
 </template>
 
 <script>

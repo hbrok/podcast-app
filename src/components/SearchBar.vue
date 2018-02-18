@@ -1,32 +1,32 @@
 <template>
-<form>
-  <label for="podcast-search">Search for a podcast</label>
-  <div class="results-wrapper">
-    <input
-      type="search"
-      name="podcast-search"
-      ref="searchBar"
-      @input="search"
-      @blur="resetSearch"
-    >
-    
-    <ul v-if="searchResults">
-      <li
-        v-for="(result, index) in searchResults"
-        :key="index"
-        @click="loadPodcast(result.feedUrl)"
+  <form>
+    <label for="podcast-search">Search for a podcast</label>
+    <div class="results-wrapper">
+      <input
+        type="search"
+        name="podcast-search"
+        ref="searchBar"
+        @input="search"
+        @blur="resetSearch"
       >
-        {{ result.trackName }}
-      </li>
-    </ul>
-  </div>
-  <button type="submit">
-    <span class="screen-reader-text">Search</span>
-    <svg class="icon icon-search">
+      
+      <ul v-if="searchResults">
+        <li
+          v-for="(result, index) in searchResults"
+          :key="index"
+          @click="loadPodcast(result.feedUrl)"
+        >
+          {{ result.trackName }}
+        </li>
+      </ul>
+    </div>
+    <button type="submit">
+      <span class="screen-reader-text">Search</span>
+      <svg class="icon icon-search">
         <use xlink:href="#search"/>
       </svg> 
-  </button>
-</form>
+    </button>
+  </form>
 </template>
 
 <script>

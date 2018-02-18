@@ -1,13 +1,13 @@
 <template>
   <div>
     <audio
-        ref="playerAudio"
-        class="player__video viewer"
-        :src="episode.audio"
-        @loadeddata="togglePlay"
-        @timeupdate="(currentTime = formatTime($event.target.currentTime)) && handleProgress()"
-        @durationchange="duration = formatTime($event.target.duration)"
-      ></audio>
+      ref="playerAudio"
+      class="player__video viewer"
+      :src="episode.audio"
+      @loadeddata="togglePlay"
+      @timeupdate="(currentTime = formatTime($event.target.currentTime)) && handleProgress()"
+      @durationchange="duration = formatTime($event.target.duration)"
+    ></audio>
 
     <div
       v-if="episode"
