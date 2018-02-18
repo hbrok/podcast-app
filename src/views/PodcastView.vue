@@ -15,7 +15,7 @@
             <li>
               <svg class="icon icon-clock">
                 <use xlink:href="#clock"/>
-              </svg> Last updated {{ lastUpdated }}
+              </svg> Last updated {{ lastUpdated | date }}
             </li>
 
             <li>
@@ -118,9 +118,6 @@ export default {
                   .getAttribute("url")
               });
             });
-
-            const lastUpdated = Date.parse(this.lastUpdated);
-            this.lastUpdated = `${lastUpdated}`;
           });
         }
       );

@@ -22,7 +22,7 @@
         <span
           aria-hidden="true"
           class="screen-reader-text">Published:
-        </span> {{ episode.pubDate }}
+        </span> {{ episode.pubDate | date }}
         <span aria-hidden="true"> | </span>
         <span
           aria-hidden="true"
