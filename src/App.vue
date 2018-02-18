@@ -2,15 +2,15 @@
   <div id="app">
   <div class="site__header">
     <div class="site__header-wrapper">
-      <SearchBar></SearchBar>
+      <SearchBar/>
     </div>
   </div>
 
-  <router-view></router-view>
+  <router-view/>
 
-  <Player></Player>
-
-  <SVGSprites></SVGSprites>
+  <Player/>
+  
+  <SVGSprites/>
 </div>
 </template>
 
@@ -22,7 +22,7 @@ import SVGSprites from "./components/SVGSprites.vue";
 import router from "./router";
 
 export default {
-  name: "app",
+  name: "App",
   router,
   components: {
     Player,

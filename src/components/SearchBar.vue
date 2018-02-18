@@ -14,7 +14,7 @@
       <li
         v-for="(result, index) in searchResults"
         :key="index"
-        v-on:click="loadPodcast(result.feedUrl)"
+        @click="loadPodcast(result.feedUrl)"
       >
         {{ result.trackName }}
       </li>
@@ -23,20 +23,23 @@
   <button type="submit">
     <span class="screen-reader-text">Search</span>
     <svg class="icon icon-search">
-        <use xlink:href="#search"></use>
+        <use xlink:href="#search"/>
       </svg> 
   </button>
 </form>
 </template>
 
 <script>
-import eventHub from "../event-hub";
-import { getJSON } from "../utils";
+import eventHub from "@/event-hub";
+import { getJSON } from "@/utils";
 
 export default {
   name: "SearchBar",
   props: {
-    msg: String
+    msg: {
+      type: String,
+      default: ""
+    }
   },
   data: function() {
     return {
@@ -52,7 +55,7 @@ export default {
     loadPodcast: function(feedUrl) {
       eventHub.$emit("load-podcast", feedUrl);
     },
-    resetSearch: function(e) {
+    resetSearch: function() {
       // e.currentTarget.value = "";
       // this.searchResults = [];
     },

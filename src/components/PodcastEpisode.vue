@@ -1,8 +1,13 @@
 <template>
 <article class="podcast-episode">
   <div>
-    <img class="podcast-episode__cover-image" :src="coverImage" alt="">
-    <button class="podcast-episode__button" v-on:click="loadEpisode">
+    <img
+      class="podcast-episode__cover-image"
+      :src="coverImage"
+      alt=""
+    >
+
+    <button class="podcast-episode__button" @click="loadEpisode">
       <svg class="icon icon-play">
         <use xlink:href="#play"></use>
       </svg> Play
@@ -17,26 +22,32 @@
     </div>
 
     <h2 class="podcast-episode__title">{{ episode.title }}</h2>
-    <p class="podcast-episode__summary" v-html="episode.description"></p>
+    <p 
+      class="podcast-episode__summary"
+      v-html="episode.description"></p>
   </div>
 </article>
 </template>
 
 <script>
-import eventHub from "../event-hub";
+import eventHub from "@/event-hub";
 
 export default {
   name: "PodcastEpisode",
   props: {
     episode: {
       type: Object,
-      default: {}
+      default: function() {
+        return {};
+      }
     },
     coverImage: {
-      type: String
+      type: String,
+      default: ""
     },
     podcastTitle: {
-      type: String
+      type: String,
+      default: ""
     }
   },
   methods: {
@@ -95,4 +106,3 @@ export default {
   color: $black;
 }
 </style>
-
