@@ -48,7 +48,7 @@
       <PodcastEpisode
         v-for="(episode, index) in episodes"
         :episode="episode"
-        :cover-image="coverImage"
+        :cover-image="episodes[index].coverImage"
         :podcast-title="title"
         :key="index"
       />
@@ -60,11 +60,7 @@
 import PodcastEpisode from "@/components/PodcastEpisode.vue";
 
 import eventHub from "@/event-hub";
-
-const getElement = (parent, tagName) =>
-  parent.getElementsByTagName(tagName)[0].textContent;
-
-const getElements = (parent, tagName) => parent.getElementsByTagName(tagName);
+import fetchPodcast from "@/podcasts";
 
 export default {
   name: "PodcastView",
@@ -87,40 +83,18 @@ export default {
   },
   methods: {
     loadPodcast: function(feedUrl) {
+      const _that = this;
+
       eventHub.$emit("reset-search");
 
-      fetch(new Request(`https://cors-anywhere.herokuapp.com/${feedUrl}`)).then(
-        results => {
-          // results returns XML. lets cast this to a string, then create
-          // a new DOM object out of it!
-          results.text().then(str => {
-            let responseDoc = new DOMParser().parseFromString(
-              str,
-              "application/xml"
-            );
-
-            this.title = getElement(responseDoc, "title");
-            this.lastUpdated = getElement(responseDoc, "pubDate");
-            this.link = getElement(responseDoc, "link");
-            this.summary = getElement(responseDoc, "itunes:summary");
-            this.coverImage = responseDoc
-              .getElementsByTagName("itunes:image")[0]
-              .getAttribute("href");
-            this.episodes = [];
-            Array.from(getElements(responseDoc, "item")).forEach(item => {
-              this.episodes.push({
-                title: getElement(item, "title"),
-                pubDate: getElement(item, "pubDate"),
-                description: getElement(item, "description"),
-                duration: getElement(item, "itunes:duration"),
-                audio: item
-                  .getElementsByTagName("enclosure")[0]
-                  .getAttribute("url")
-              });
-            });
-          });
-        }
-      );
+      fetchPodcast(feedUrl).then(function(response) {
+        _that.title = response.title;
+        _that.lastUpdated = response.lastUpdated;
+        _that.link = response.link;
+        _that.summary = response.summary;
+        _that.coverImage = response.coverImage;
+        _that.episodes = response.episodes;
+      });
     }
   }
 };
