@@ -5,7 +5,7 @@ import format from "date-fns/format";
 
 Vue.config.productionTip = false;
 
-Vue.filter("date", function(date, dateFormat = "MMMM Q, YYYY") {
+Vue.filter("date", function(date, dateFormat = "MMMM D, YYYY") {
   return format(date, dateFormat);
 });
 
