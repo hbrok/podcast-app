@@ -23,11 +23,14 @@
           aria-hidden="true"
           class="screen-reader-text">Published:
         </span> {{ episode.pubDate | date }}
-        <span aria-hidden="true"> | </span>
-        <span
-          aria-hidden="true"
-          class="screen-reader-text"
-        >Duration:</span> {{ episode.duration }}
+
+        <span v-if="episode.duration">
+          <span aria-hidden="true"> | </span>
+          <span
+            aria-hidden="true"
+            class="screen-reader-text"
+          >Duration:</span> {{ episode.duration }}
+        </span>
       </div>
 
       <h2 class="podcast-episode__title">{{ episode.title }}</h2>
@@ -113,5 +116,11 @@ export default {
   font-weight: bold;
   font-size: 14px;
   color: $black;
+  transition: background-color 0.25s, color 0.25s;
+
+  &:hover {
+    background-color: $black;
+    color: $white;
+  }
 }
 </style>
