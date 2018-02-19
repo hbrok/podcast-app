@@ -10,6 +10,11 @@ export default new Router({
       path: "/",
       name: "PodcastView",
       component: PodcastView
+    },
+    {
+      path: "/:itunesId",
+      name: "PodcastView",
+      component: PodcastView
     }
   ]
 });

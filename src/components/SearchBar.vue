@@ -11,7 +11,7 @@
         @blur="resetSearch"
         @keyup.up="prevSearchResult"
         @keyup.down.prevent="nextSearchResult"
-        @keyup.enter="loadPodcast(searchResults[selectedSearchResult].feedUrl)"
+        @keyup.enter="loadPodcast(searchResults[selectedSearchResult].trackId)"
       >
       
       <ul v-if="searchResults">
@@ -19,7 +19,7 @@
           v-for="(result, index) in searchResults"
           :key="index"
           :class="index === selectedSearchResult ? 'selected' : ''"
-          @click="loadPodcast(result.feedUrl)"
+          @click="loadPodcast(result.trackId)"
         >
           {{ result.trackName }}
         </li>
@@ -35,6 +35,7 @@
 </template>
 
 <script>
+import router from "@/router";
 import eventHub from "@/event-hub";
 import { getJSON } from "@/utils";
 
@@ -68,8 +69,8 @@ export default {
         ? (this.selectedSearchResult = this.searchResults.length - 1)
         : this.selectedSearchResult--;
     },
-    loadPodcast: function(feedUrl) {
-      eventHub.$emit("load-podcast", feedUrl);
+    loadPodcast: function(trackId) {
+      router.push({ path: `/${trackId}` });
     },
     resetSearch: function() {
       const _that = this;
@@ -105,7 +106,8 @@ export default {
           for (var i = 0; i < response.results.length; i++) {
             _that.searchResults.push({
               trackName: response.results[i].trackName,
-              feedUrl: response.results[i].feedUrl
+              feedUrl: response.results[i].feedUrl,
+              trackId: response.results[i].trackId
             });
           }
 

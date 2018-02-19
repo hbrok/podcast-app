@@ -61,6 +61,7 @@ import PodcastEpisode from "@/components/PodcastEpisode.vue";
 
 import eventHub from "@/event-hub";
 import fetchPodcast from "@/podcasts";
+import { getJSON } from "@/utils";
 
 export default {
   name: "PodcastView",
@@ -77,9 +78,14 @@ export default {
       episodes: []
     };
   },
+  watch: {
+    "$route.params.itunesId"(to, from) {
+      this.loadPodcastByItunesId(this.$route.params.itunesId);
+    }
+  },
   created: function() {
-    this.loadPodcast(`https://mbmbam.libsyn.com/rss`);
     eventHub.$on("load-podcast", this.loadPodcast);
+    this.loadPodcastByItunesId(367330921); // Load MBMBaM
   },
   methods: {
     loadPodcast: function(feedUrl) {
@@ -95,6 +101,16 @@ export default {
         _that.coverImage = response.coverImage;
         _that.episodes = response.episodes;
       });
+    },
+    loadPodcastByItunesId: function(id) {
+      const _that = this;
+
+      getJSON(
+        `https://itunes.apple.com/lookup?id=${this.$route.params.itunesId}`,
+        function(response) {
+          _that.loadPodcast(response.results[0].feedUrl);
+        }
+      );
     }
   }
 };
