@@ -45,6 +45,12 @@
     </div>
 
     <section class="podcast__episodes">
+      <div class="loading" v-if="loading">
+      <svg class="icon icon-loading">
+        <use xlink:href="#loading"/>
+      </svg>
+    </div>
+
       <PodcastEpisode
         v-for="(episode, index) in episodes"
         :episode="episode"
@@ -70,6 +76,7 @@ export default {
   },
   data: function() {
     return {
+      loading: false,
       title: "",
       lastUpdated: "",
       link: "",
@@ -90,6 +97,7 @@ export default {
   methods: {
     loadPodcast: function(feedUrl) {
       const _that = this;
+      this.loading = true;
 
       eventHub.$emit("reset-search");
 
@@ -100,6 +108,7 @@ export default {
         _that.summary = response.summary;
         _that.coverImage = response.coverImage;
         _that.episodes = response.episodes;
+        _that.loading = false;
       });
     },
     loadPodcastByItunesId: function(id) {
@@ -118,6 +127,17 @@ export default {
 
 <style lang="scss">
 @import "../variables.scss";
+
+.loading {
+  text-align: center;
+}
+
+.icon.icon-loading {
+  width: 8rem;
+  height: 8rem;
+  max-width: 100%;
+  margin: 0 auto;
+}
 
 .podcast__header {
   margin-bottom: 1rem;
@@ -152,9 +172,12 @@ export default {
 
 .podcast__cover-image {
   grid-area: podcast-image;
+  height: 300px;
+  width: 300px;
   max-width: 100%;
   border-radius: 5px;
   box-shadow: 0 5px 20px 0px rgba(50, 70, 107, 0.5);
+  background-color: $light-grey;
 }
 
 .podcast__meta {

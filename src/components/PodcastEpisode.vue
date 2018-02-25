@@ -102,8 +102,11 @@ export default {
 }
 
 .podcast-episode__cover-image {
+  height: 150px;
+  width: 150px;
   max-width: 100%;
   border-radius: 5px;
+  background-color: $light-grey;
 }
 
 .podcast-episode__button {
