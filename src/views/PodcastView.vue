@@ -92,7 +92,7 @@ export default {
   },
   created: function() {
     eventHub.$on("load-podcast", this.loadPodcast);
-    this.loadPodcastByItunesId(367330921); // Load MBMBaM
+    this.loadPodcastByItunesId(this.$route.params.itunesId);
   },
   methods: {
     loadPodcast: function(feedUrl) {
