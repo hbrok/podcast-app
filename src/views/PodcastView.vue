@@ -96,28 +96,25 @@ export default {
   },
   methods: {
     loadPodcast: function(feedUrl) {
-      const _that = this;
       this.loading = true;
 
       eventHub.$emit("reset-search");
 
-      fetchPodcast(feedUrl).then(function(response) {
-        _that.title = response.title;
-        _that.lastUpdated = response.lastUpdated;
-        _that.link = response.link;
-        _that.summary = response.summary;
-        _that.coverImage = response.coverImage;
-        _that.episodes = response.episodes;
-        _that.loading = false;
+      fetchPodcast(feedUrl).then(response => {
+        this.title = response.title;
+        this.lastUpdated = response.lastUpdated;
+        this.link = response.link;
+        this.summary = response.summary;
+        this.coverImage = response.coverImage;
+        this.episodes = response.episodes;
+        this.loading = false;
       });
     },
     loadPodcastByItunesId: function(id) {
-      const _that = this;
-
       getJSON(
         `https://itunes.apple.com/lookup?id=${this.$route.params.itunesId}`,
-        function(response) {
-          _that.loadPodcast(response.results[0].feedUrl);
+        response => {
+          this.loadPodcast(response.results[0].feedUrl);
         }
       );
     }
