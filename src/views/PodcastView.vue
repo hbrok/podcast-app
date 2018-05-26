@@ -12,19 +12,19 @@
         <div class="podcast__meta">
           <p>{{ summary }}</p>
           <ul class="podcast__meta--list">
-            <li>
+            <li v-if="lastUpdated">
               <svg class="icon icon-clock">
                 <use xlink:href="#clock"/>
               </svg> Last updated {{ lastUpdated | date }}
             </li>
 
-            <li>
+            <li v-if="link">
               <svg class="icon icon-link">
                 <use xlink:href="#link"/>
               </svg> <a :href="link">{{ link }}</a>
             </li>
 
-            <li>
+            <li v-if="episodes.length">
               <svg class="icon icon-headphones">
                 <use xlink:href="#headphones"/>
               </svg> {{ episodes.length }} episodes
