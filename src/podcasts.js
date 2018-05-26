@@ -42,9 +42,9 @@ const fetchPodcastFeed = feedUrl => {
             ? item.getElementsByTagName("itunes:duration")[0].textContent
             : false,
           audio: item.getElementsByTagName("enclosure")[0].getAttribute("url"),
-          coverImage:
-            item.getElementsByTagName("itunes:image")[0].getAttribute("href") ||
-            data.coverImage
+          coverImage: item.getElementsByTagName("itunes:image")[0]
+            ? item.getElementsByTagName("itunes:image")[0].getAttribute("href")
+            : data.coverImage
         });
       });
 
