@@ -9,9 +9,9 @@
           alt=""
         >
 
-        <div>
+        <div class="podcast__meta">
           <p>{{ summary }}</p>
-          <ul class="podcast__meta">
+          <ul class="podcast__meta--list">
             <li>
               <svg class="icon icon-clock">
                 <use xlink:href="#clock"/>
@@ -148,28 +148,42 @@ export default {
 
 .podcast__header-inner {
   display: grid;
-  grid-template-columns: minmax(0, 300px) auto;
-  grid-column-gap: 20px;
+  grid-gap: 20px;
+  grid-template-columns: 100px auto;
   grid-template-areas:
     "podcast-image podcast-title"
-    "podcast-image podcast-meta";
+    "podcast-meta podcast-meta";
   width: 100%;
-  max-width: 895px;
-  padding: 2rem;
+  max-width: 600px;
+  padding: 1rem;
   margin: 0 auto;
   color: $white;
+  box-sizing: border-box;
+
+  @media screen and (min-width: 750px) {
+    grid-template-columns: minmax(0, 300px) auto;
+    grid-template-areas:
+      "podcast-image podcast-title"
+      "podcast-image podcast-meta";
+    padding: 2rem;
+    max-width: 895px;
+  }
 }
 
 .podcast__title {
   grid-area: podcast-title;
+  align-self: center;
   margin: 0;
-  margin-bottom: 1rem;
-  font-size: 2rem;
+  font-size: 1.5rem;
+
+  @media screen and (min-width: 750px) {
+    font-size: 2rem;
+  }
 }
 
 .podcast__cover-image {
   grid-area: podcast-image;
-  height: 300px;
+  height: auto;
   width: 300px;
   max-width: 100%;
   border-radius: 5px;
@@ -179,6 +193,9 @@ export default {
 
 .podcast__meta {
   grid-area: podcast-meta;
+}
+
+.podcast__meta--list {
   margin: 0;
   padding: 0;
   list-style-type: none;

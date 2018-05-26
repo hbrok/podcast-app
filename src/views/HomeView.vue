@@ -75,10 +75,12 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 @import "../variables.scss";
 
 .podcast__header {
+  display: grid;
+  grid-template-columns: 50% 50%;
   margin-bottom: 1rem;
   background-image: linear-gradient(-147deg, #de8d94 0%, #808fae 100%);
 
@@ -100,6 +102,7 @@ export default {
   padding: 2rem;
   margin: 0 auto;
   color: $white;
+  box-sizing: border-box
 }
 
 .podcast__title {

@@ -79,11 +79,15 @@ export default {
 
 .podcast-episode {
   display: grid;
-  grid-template-columns: 150px auto;
+  grid-template-columns: 100px auto;
   grid-gap: 20px;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid $light-grey;
+
+  @media screen and (min-width: 600px) {
+    grid-template-columns: 150px auto;
+  }
 }
 
 .podcast-episode__title {
@@ -102,7 +106,7 @@ export default {
 }
 
 .podcast-episode__cover-image {
-  height: 150px;
+  height: auto;
   width: 150px;
   max-width: 100%;
   border-radius: 5px;

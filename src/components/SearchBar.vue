@@ -143,7 +143,7 @@ label {
 }
 
 button {
-  padding: 0.45rem 0.75rem;
+  padding: 0.46rem 0.75rem;
   border-color: #e8e8e8;
   border-radius: 0 5px 5px 0;
   background-color: $light-grey;
